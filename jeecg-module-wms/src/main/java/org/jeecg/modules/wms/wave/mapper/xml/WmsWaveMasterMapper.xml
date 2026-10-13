@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.wave.mapper.WmsWaveMasterMapper">
+    <select id="queryList" parameterType="org.jeecg.modules.wms.wave.entity.WmsWaveMaster" resultType="org.jeecg.modules.wms.wave.entity.WmsWaveMaster">
+
+        select
+        t.*,
+        w.warehouse_name,
+        (select count(1) from wms_shipment where wave_id=t.id) total_shipments
+        from wms_wave_master t left join wms_warehouses w on t.warehouse_id=w.id
+        where 1=1
+        <!--波次编码-->
+        <if test="waveNo != null and waveNo !=''">
+            and t.wave_no = #{waveNo}
+        </if>
+        <if test="status != null and status !=''">
+            and t.status = #{status}
+        </if>
+    </select>
+</mapper>
