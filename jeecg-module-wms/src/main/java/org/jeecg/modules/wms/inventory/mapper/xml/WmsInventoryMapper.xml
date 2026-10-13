@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.inventory.mapper.WmsInventoryMapper">
+    <!--综合查询库存列表-->
+    <select id="queryList" resultType="org.jeecg.modules.wms.inventory.entity.WmsInventory" parameterType="org.jeecg.modules.wms.inventory.entity.WmsInventory">
+        SELECT a.*,
+        b.product_name,
+        b.product_code,
+        c.owner_code,
+        c.owner_name,
+        d.location_code,
+        d.location_type,
+        d.location_category,
+        e.zone_name,
+        e.zone_type,
+        f.warehouse_name
+        FROM wms_inventory a,
+        wms_products b,
+        wms_cargo_owners c,
+        wms_storage_locations d,
+        wms_storage_zones e,
+        wms_warehouses f
+        WHERE a.product_id = b.id
+        and b.owner_id = c.id
+        and a.location_code = d.location_code
+        and d.zone_id=e.id
+        and f.id=e.warehouse_id
+        <if test="productName != null and productName != ''">
+            AND b.product_name LIKE concat('%',#{productName},'%')
+        </if>
+        <if test="productCode != null and productCode != ''">
+            AND b.product_code = #{productCode}
+        </if>
+        <if test="ownerCode != null and ownerCode != ''">
+            AND c.owner_code = #{ownerCode}
+        </if>
+        <if test="ownerName != null and ownerName != ''">
+            AND c.owner_name LIKE concat('%',#{ownerName},'%')
+        </if>
+        <if test="warehouseName != null and warehouseName != ''">
+            AND f.warehouse_name LIKE concat('%',#{warehouseName},'%')
+        </if>
+        <if test="warehouseCode != null and warehouseCode != ''">
+            AND f.warehouse_code = #{warehouseCode}
+        </if>
+        <if test="zoneType != null and zoneType != ''">
+            AND e.zone_type = #{zoneType}
+        </if>
+        <if test="locationCode != null and locationCode != ''">
+            AND d.location_code = #{locationCode}
+        </if>
+
+    </select>
+</mapper>
