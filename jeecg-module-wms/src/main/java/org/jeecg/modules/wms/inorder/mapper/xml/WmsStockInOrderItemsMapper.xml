@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.inorder.mapper.WmsStockInOrderItemsMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE
+		FROM  wms_stock_in_order_items
+		WHERE
+			 order_id = #{mainId} 	</delete>
+
+
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.wms.inorder.entity.WmsStockInOrderItems">
+		SELECT a.*,wp.product_code,wp.product_name
+		FROM  wms_stock_in_order_items a left join wms_products wp on a.product_id = wp.id
+		WHERE
+			a.order_id = #{mainId}    </select>
+</mapper>

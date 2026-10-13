@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.wmstask.mapper.WmsTasksMapper">
+    <select id="queryTaskList"
+            parameterType="org.jeecg.modules.wms.wmstask.entity.WmsTasks"
+            resultType="org.jeecg.modules.wms.wmstask.entity.WmsTasks">
+        select a.*,ww.warehouse_name ,b.product_name,wco.owner_name,wsio.order_number stock_in_order_number
+        from wms_tasks a
+                 left join wms_warehouses ww on a.target_warehouse_id=ww.id
+                 left join wms_products b on a.product_id = b.id
+                 left join wms_cargo_owners wco on b.owner_id = wco.id
+                 left join wms_stock_in_orders wsio on a.stock_in_order_id = wsio.id
+                 left join wms_stock_in_order_items wsioi on a.stock_in_order_item_id = wsioi.id
+        where 1=1
+        <!--任务编号-->
+        <if test="taskNumber != null and taskNumber != ''">
+            and a.task_number = #{taskNumber}
+        </if>
+        <if test="taskType != null and taskType !=''">
+            and a.task_type = #{taskType}
+        </if>
+        <if test="taskStatus != null and taskStatus !=''">
+            and a.task_status = #{taskStatus}
+        </if>
+        <if test="stockInOrderNumber != null and stockInOrderNumber !=''">
+            and wsio.order_number = #{stockInOrderNumber}
+        </if>
+        <!--根据波次id查询-->
+        <if test="waveOrderId != null and waveOrderId !=''">
+            and a.wave_order_id = #{waveOrderId}
+        </if>
+        <!--执行人-->
+        <if test="operator != null and operator !=''">
+            and a.operator = #{operator}
+        </if>
+        order by a.create_time desc
+    </select>
+</mapper>
