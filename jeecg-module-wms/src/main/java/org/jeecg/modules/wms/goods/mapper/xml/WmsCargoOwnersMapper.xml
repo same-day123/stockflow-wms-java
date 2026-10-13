@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 旧 namespace：org.jeecg.modules.wms.analysis.mapper.BigscreenMapper -->
+<mapper namespace="org.jeecg.modules.wms.goods.mapper.WmsCargoOwnersMapper">
+    <!-- 旧大屏代码已迁移到 analysis/mapper/xml/BigscreenMapper.xml。
+         下面使用未被引用的 sql 节点保留原内容，不会参与执行。 -->
+<!--    <sql id="legacyBigscreenSql"><![CDATA[-->
+<!--    &lt;!&ndash; 查询待办任务列表 &ndash;&gt;-->
+<!--    <select id="countTaskList"-->
+<!--            parameterType="org.jeecg.modules.wms.wmstask.entity.WmsTasks"-->
+<!--            resultType="org.jeecg.modules.wms.wmstask.entity.WmsTasks">-->
+<!--        select t.task_type, count(1) taskCount-->
+<!--        from wms_tasks t-->
+<!--        where 1 = 1-->
+<!--        &lt;!&ndash;根据任务状态查询&ndash;&gt;-->
+<!--        <if test="taskStatus != null and taskStatus != ''">-->
+<!--            and t.task_status = #{taskStatus}-->
+<!--        </if>-->
+<!--        &lt;!&ndash;根据来源仓库查询&ndash;&gt;-->
+<!--        <if test="sourceWarehouseId != null and sourceWarehouseId != ''">-->
+<!--            and t.source_warehouse_id = #{sourceWarehouseId}-->
+<!--        </if>-->
+<!--        &lt;!&ndash;根据目的仓库查询&ndash;&gt;-->
+<!--        <if test="targetWarehouseId != null and targetWarehouseId != ''">-->
+<!--            and t.target_warehouse_id = #{targetWarehouseId}-->
+<!--        </if>-->
+<!--        &lt;!&ndash;根据创建时间查询&ndash;&gt;-->
+<!--        <if test="createTimeString != null and createTimeString != ''">-->
+<!--            and date(t.create_time) = #{createTimeString}-->
+<!--        </if>-->
+<!--        group by t.task_type-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; 查询入库趋势 &ndash;&gt;-->
+<!--    <select id="sumInboundByMonth"-->
+<!--            resultType="org.jeecg.modules.wms.analysis.vo.TrendPoint">-->
+<!--        WITH RECURSIVE months AS (-->
+<!--        SELECT MAKEDATE(#{year}, 1) AS m-->
+<!--        UNION ALL-->
+<!--        SELECT m + INTERVAL 1 MONTH FROM months-->
+<!--        WHERE m &lt; MAKEDATE(#{year}, 1) + INTERVAL 11 MONTH-->
+<!--        )-->
+<!--        SELECT-->
+<!--        CONCAT(MONTH(mt.m), '月') AS name,-->
+<!--        IFNULL(SUM(wsio.total_expected_quantity), 0) AS value-->
+<!--        FROM months mt-->
+<!--        LEFT JOIN wms_stock_in_orders wsio-->
+<!--        ON wsio.expected_arrival_time &gt;= mt.m-->
+<!--        AND wsio.expected_arrival_time &lt; mt.m + INTERVAL 1 MONTH-->
+<!--        where 1=1-->
+<!--        <if test="warehouseId != null and warehouseId != ''">-->
+<!--            AND wsio.warehouse_id = #{warehouseId}-->
+<!--        </if>-->
+<!--        GROUP BY mt.m-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; 查询出库趋势 &ndash;&gt;-->
+<!--    <select id="sumOutboundByMonth"-->
+<!--            resultType="org.jeecg.modules.wms.analysis.vo.TrendPoint">-->
+<!--        WITH RECURSIVE months AS (-->
+<!--        SELECT MAKEDATE(#{year}, 1) AS m-->
+<!--        UNION ALL-->
+<!--        SELECT m + INTERVAL 1 MONTH FROM months-->
+<!--        WHERE m &lt; MAKEDATE(#{year}, 1) + INTERVAL 11 MONTH-->
+<!--        )-->
+<!--        SELECT-->
+<!--        CONCAT(MONTH(mt.m), '月') AS name,-->
+<!--        IFNULL(SUM(wsoo.total_...), 0) AS value-->
+<!--        FROM months mt-->
+<!--        LEFT JOIN wms_stock_out_orders wsoo-->
+<!--        ON wsoo.expected_arrival_time &gt;= mt.m-->
+<!--        AND wsoo.expected_arrival_time &lt;  mt.m + INTERVAL 1 MONTH-->
+<!--        where 1=1-->
+<!--        <if test="warehouseId != null and warehouseId != ''">-->
+<!--            AND wsoo.warehouse_id = #{warehouseId}-->
+<!--        </if>-->
+<!--        GROUP BY mt.m-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; 货主出库排行榜 &ndash;&gt;-->
+<!--    <select id="countConsigneeOutbound"-->
+<!--            resultType="org.jeecg.modules.wms.analysis.vo.RankItemVO">-->
+<!--        select SUM(wooi.packed_quantity) as account, wco.owner_name-->
+<!--        from wms_out_orders_items wooi-->
+<!--                 left join wms_out_orders woo on wooi.order_id = woo.id-->
+<!--                 left join wms_products wp on wp.id = wooi.sku_id-->
+<!--                 left join wms_cargo_owners wco on wp.owner_id = wco.id-->
+<!--        where 1=1-->
+<!--        <if test="warehouseId != null and warehouseId != ''">-->
+<!--            AND woo.warehouse_id = #{warehouseId}-->
+<!--        </if>-->
+<!--        group by wp.owner_id-->
+<!--        order by account desc-->
+<!--    </select>-->
+
+<!--    ]]></sql>-->
+</mapper>
