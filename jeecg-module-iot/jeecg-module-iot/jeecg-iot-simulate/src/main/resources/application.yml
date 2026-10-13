@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: wms-iot-simulate
+  profiles:
+    active: local

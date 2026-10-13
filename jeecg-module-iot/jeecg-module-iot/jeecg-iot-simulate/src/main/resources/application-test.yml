@@ -1,0 +1,160 @@
+server:
+  port: 18084
+
+
+# 设备信息配置
+device-infos:
+  # EMQX broker 服务器地址
+  brokerUri: tcp://172.17.2.122:1883
+  # 上报频率（秒）
+  report-interval: 5
+  # 设备数据上报主题
+  pubTopic: "wms/iot/report"
+  # 设备信息列表
+  devices:
+    - deviceName: 1号空调
+      deviceCode: d02
+      enable: true
+      # 认证密码（默认不需要，当服务端配置了访问控制-客户端认证时必需）
+      password: wms-iot
+      # 订阅设备控制主题，格式："wms/iot/ctrl/" + productCode
+      subTopic: "wms/iot/ctrl/t_h_sensor"
+      samples-rule: back_and_forth
+      # 样本数据
+#      samples: [
+#      { "temperature": 51.0, "humidity": 20 }
+#    ]
+      samples: [
+      { "temperature01": 5.0, "humidity": 20 },
+      { "temperature01": 6.0, "humidity": 20 },
+      { "temperature01": 7.0, "humidity": 20 },
+      { "temperature01": 10.0, "humidity": 30 },
+      { "temperature01": 11.0, "humidity": 30 },
+      { "temperature01": 12.0, "humidity": 30 },
+      { "temperature01": 16.0, "humidity": 50 },
+      { "temperature01": 17.0, "humidity": 50 },
+      { "temperature01": 18.0, "humidity": 50 },
+      { "temperature01": 22.3, "humidity": 10 },
+      { "temperature01": 23.3, "humidity": 10 },
+      { "temperature01": 25.3, "humidity": 10 }
+    ]
+#    - deviceName: 测试空调
+#      deviceCode: d08
+#      enable: true
+#      # 认证密码
+#      password: wms-iot
+#      # 订阅设备控制主题，格式："wms/iot/ctrl/" + productCode
+#      subTopic: "wms/iot/ctrl/t_h_sensor"
+#      samples-rule: loop
+#      samples: [
+#        { "temperature01": 5.0, "humidity": 20 },
+#        { "temperature01": 6.0, "humidity": 20 },
+#        { "temperature01": 7.0, "humidity": 20 },
+#        { "temperature01": 10.0, "humidity": 30 }
+#      ]
+#    - deviceName: 智能空调
+#      deviceCode: air_gree_01
+#      enable: false
+#      password: wms-iot
+#      subTopic: "wms/iot/ctrl/air_gree"
+#      samples: [
+#        { "battery": 85.5 },
+#        { "battery": 85.5 },
+#        { "battery": 85.5 },
+#        { "battery": 82.3 },
+#        { "battery": 82.3 },
+#        { "battery": 82.3 }
+#      ]
+#    - deviceName: 智能空调001
+#      deviceCode: ACD-CM2000-001
+#      enable: false
+#      password: wms-iot
+#      subTopic: "wms/iot/ctrl/air_gree"
+#      report-interval: 5
+#      samples-rule: loop
+#      samples: [
+#        { "CURR_TEMP": 80 },
+#        { "CURR_TEMP": 90 },
+#        { "CURR_TEMP": 70 },
+#        { "CURR_TEMP": 100 },
+#        { "CURR_TEMP": 100 },
+#        { "CURR_TEMP": 100 },
+#        { "CURR_TEMP": 50 },
+#        { "CURR_TEMP": 50 },
+#        { "CURR_TEMP": 50 }
+#      ]
+#    - deviceName: 集体设备测试001
+#      deviceCode: jiticeshi001
+#      enable: false
+#      # 认证密码
+#      password: wms-iot
+#      # 订阅设备控制主题，格式："wms/iot/ctrl/" + productCode
+#      subTopic: "wms/iot/ctrl/ceshiicon001"
+#      samples-rule: back_and_forth
+#      # 样本数据
+#      samples: [
+#        {"yusheberiguanliguanlian": 30},
+#        {"yusheberiguanliguanlian": 30},
+#        {"yusheberiguanliguanlian": 30},
+#        {"yusheberiguanliguanlian": 30},
+#        {"yusheberiguanliguanlian": 30},
+#        {"yusheberiguanliguanlian": 30}
+#      ]
+#    - deviceName: 0604测试
+#      deviceCode: 0604test
+#      report-interval: 3
+#      enable: true
+#      # 认证密码
+#      password: wms-iot
+#      # 订阅设备控制主题，格式："wms/iot/ctrl/" + productCode
+#      subTopic: "wms/iot/ctrl/1234"
+#      # 样本数据
+#      samples: [
+#        { "060444": 10 },
+#        { "060444": 20 },
+#        { "060444": 30 },
+#        { "060444": "哈哈"}
+#      ]
+#    - deviceName: 超级无敌好用的设备2
+#      deviceCode: shebei2
+#      report-interval: 3
+#      enable: false
+#      subTopic: "wms/iot/ctrl/air_gree"
+#      samples: [
+#        { "Measuring_temperature": 28 , "Measure_humidity": 8 , "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 38 , "Measure_humidity": 10, "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 48 , "Measure_humidity": 99, "shebeizhuangtai": "不开心" },
+#        { "Measuring_temperature": 58,  "Measure_humidity": 22, "shebeizhuangtai": "一般开心" },
+#        { "Measuring_temperature": 68,  "Measure_humidity": 18, "shebeizhuangtai": "开心哈哈哈" },
+#        { "Measuring_temperature": 78 , "Measure_humidity": 78, "shebeizhuangtai": "开心啦啦啦啦啦啦" },
+#        { "Measuring_temperature": 18,  "Measure_humidity": 18, "shebeizhuangtai": "开心哇呀呀呀啊呀呀呀呀呀啊呀呀呀" },
+#        { "Measuring_temperature": 28 , "Measure_humidity": 8 , "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 38 , "Measure_humidity": 10, "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 48 , "Measure_humidity": 99, "shebeizhuangtai": "不开心" },
+#        { "Measuring_temperature": 58,  "Measure_humidity": 22, "shebeizhuangtai": "一般开心" },
+#        { "Measuring_temperature": 68,  "Measure_humidity": 18, "shebeizhuangtai": "开心哈哈哈" },
+#        { "Measuring_temperature": 78 , "Measure_humidity": 78, "shebeizhuangtai": "开心啦啦啦啦啦啦" },
+#        { "Measuring_temperature": 18,  "Measure_humidity": 18, "shebeizhuangtai": "开心哇呀呀呀啊呀呀呀呀呀啊呀呀呀" },
+#        { "Measuring_temperature": 28 , "Measure_humidity": 8 , "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 38 , "Measure_humidity": 10, "shebeizhuangtai": "开心" },
+#        { "Measuring_temperature": 48 , "Measure_humidity": 99, "shebeizhuangtai": "不开心" },
+#        { "Measuring_temperature": 58,  "Measure_humidity": 22, "shebeizhuangtai": "一般开心" },
+#        { "Measuring_temperature": 68,  "Measure_humidity": 18, "shebeizhuangtai": "开心哈哈哈" },
+#        { "Measuring_temperature": 78 , "Measure_humidity": 78, "shebeizhuangtai": "开心啦啦啦啦啦啦" },
+#        { "Measuring_temperature": 18,  "Measure_humidity": 18, "shebeizhuangtai": "开心哇呀呀呀啊呀呀呀呀呀啊呀呀呀" }
+#      ]
+
+influx:
+  url: http://172.17.2.122:8086/
+  # token: uaxLJK_ZO8nxFFsjxcQoA4X-L8friFuJIKl-1d6-6dmaL3M7yhja_OUPuiPmvoGxFgvDW040TNghTldqFBa35g==
+  token: VdB4WlOV6ghGglFGi8hNThPg0UAexceOsPUEKZgoue-UUOmzoT0G0L-uK4rVCViHO23wp3ECVwTx9bBbJaCSQw==
+  bucket: wms-iot
+  org: mrt
+  username: root
+  password: influxdb
+
+spring:
+  data:
+    redis:
+      host: 172.17.2.122
+      port: 6379

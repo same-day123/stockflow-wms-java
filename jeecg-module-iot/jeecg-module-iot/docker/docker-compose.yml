@@ -1,0 +1,17 @@
+services:
+  wms-iot-alert:
+    image: itcast/wms-iot-alert:1.0
+    container_name: wms-iot-alert
+    ports:
+      - "18082:18082"
+    volumes:
+      - /root/xingchen/wms/wms-iot/alert/config:/app/config
+    restart: always
+  wms-iot-simulate:
+    image: itcast/wms-iot-simulate:1.0
+    container_name: wms-iot-simulate
+    ports:
+      - "18084:18084"
+    volumes:
+      - /root/xingchen/wms/wms-iot/simulate/config:/app/config
+    restart: always

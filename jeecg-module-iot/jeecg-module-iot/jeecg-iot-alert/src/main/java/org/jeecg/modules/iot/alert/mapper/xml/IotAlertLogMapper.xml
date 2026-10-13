@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.iot.alert.mapper.IotAlertLogMapper">
+
+    <update id="autoRecoverAlertLog">
+        UPDATE wms_iot_alert_log
+        SET process_status = "1",
+            process_plan = #{processPlan},
+            process_time = #{processTime}
+        WHERE rule_id = #{ruleId}
+        AND process_status = "0"
+    </update>
+
+    <select id="selectUnsolvedAlertLogsAlongWithRule" resultType="org.jeecg.modules.iot.alert.entity.IotAlertLog">
+        SELECT
+            *,
+            rule.model_code,
+            rule.operator,
+            rule.threshold,
+            rule.cycle
+        FROM wms_iot_alert_log al
+        LEFT JOIN wms_iot_alert_rule rule
+        ON al.rule_id = rule.id
+        WHERE al.process_status = '0'
+        AND rule.threshold IS NOT NULL
+    </select>
+</mapper>

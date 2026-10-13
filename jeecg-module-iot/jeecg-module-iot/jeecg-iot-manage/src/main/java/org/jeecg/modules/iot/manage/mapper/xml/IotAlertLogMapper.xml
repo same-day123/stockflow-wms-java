@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.iot.manage.mapper.IotAlertLogMapper">
+
+    <select id="getAlertCount" resultType="org.jeecg.modules.iot.manage.dto.AlertLogCount">
+        SELECT
+        process_status AS processStatus,
+        COUNT(*) AS count
+        FROM wms_iot_alert_log
+        WHERE 1 = 1
+        <if test="orgCodes != null">
+            AND sys_org_code IN
+            <foreach collection="orgCodes" item="orgCode" open="(" separator="," close=")">
+                #{orgCode}
+            </foreach>
+        </if>
+        <if test="log.productCode != null and log.productCode != ''">
+            AND product_code = #{log.productCode}
+        </if>
+        <if test="log.deviceCode != null and log.deviceCode != ''">
+            AND device_code = #{log.deviceCode}
+        </if>
+        <if test="log.alertLevel != null and log.alertLevel != ''">
+            AND alert_level = #{log.alertLevel}
+        </if>
+        GROUP BY processStatus
+    </select>
+</mapper>

@@ -1,0 +1,14 @@
+package org.jeecg.modules.iot.alert.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.jeecg.modules.iot.alert.entity.IotAlertRule;
+
+/**
+ * @Description: 报警规则表
+ * @Author: jeecg-boot
+ * @Date:   2025-05-03
+ * @Version: V1.0
+ */
+public interface IotAlertRuleMapper extends BaseMapper<IotAlertRule> {
+
+}

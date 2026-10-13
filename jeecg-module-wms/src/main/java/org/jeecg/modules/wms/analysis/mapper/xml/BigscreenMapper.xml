@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.analysis.mapper.BigscreenMapper">
+
+    <select id="countTaskList"
+            parameterType="org.jeecg.modules.wms.wmstask.entity.WmsTasks"
+            resultType="org.jeecg.modules.wms.wmstask.entity.WmsTasks">
+        SELECT t.task_type, COUNT(1) AS taskCount
+        FROM wms_tasks t
+        WHERE 1 = 1
+        <if test="taskStatus != null and taskStatus != ''">
+            AND t.task_status = #{taskStatus}
+        </if>
+        <if test="sourceWarehouseId != null and sourceWarehouseId != ''">
+            AND t.source_warehouse_id = #{sourceWarehouseId}
+        </if>
+        <if test="targetWarehouseId != null and targetWarehouseId != ''">
+            AND t.target_warehouse_id = #{targetWarehouseId}
+        </if>
+        <if test="createTimeString != null and createTimeString != ''">
+            AND DATE(t.create_time) = #{createTimeString}
+        </if>
+        GROUP BY t.task_type
+    </select>
+
+    <select id="sumInboundByMonth"
+            resultType="org.jeecg.modules.wms.analysis.vo.TrendPoint">
+        WITH RECURSIVE months AS (
+            SELECT MAKEDATE(#{year}, 1) AS m
+            UNION ALL
+            SELECT m + INTERVAL 1 MONTH
+            FROM months
+            WHERE m &lt; MAKEDATE(#{year}, 1) + INTERVAL 11 MONTH
+        )
+        SELECT
+            CONCAT(MONTH(months.m), '月') AS name,
+            COALESCE(SUM(wsio.total_expected_quantity), 0) AS value
+        FROM months
+        LEFT JOIN wms_stock_in_orders wsio
+            <!-- 旧条件只使用 expected_arrival_time，时间为空的入库单不会进入趋势统计。 -->
+            <!-- ON wsio.expected_arrival_time &gt;= months.m
+            AND wsio.expected_arrival_time &lt; months.m + INTERVAL 1 MONTH -->
+            ON COALESCE(wsio.expected_arrival_time, wsio.create_time) &gt;= months.m
+            AND COALESCE(wsio.expected_arrival_time, wsio.create_time) &lt; months.m + INTERVAL 1 MONTH
+            <if test="warehouseId != null and warehouseId != ''">
+                AND wsio.warehouse_id = #{warehouseId}
+            </if>
+        GROUP BY months.m
+        ORDER BY months.m
+    </select>
+
+    <select id="sumOutboundByMonth"
+            resultType="org.jeecg.modules.wms.analysis.vo.TrendPoint">
+        WITH RECURSIVE months AS (
+            SELECT MAKEDATE(#{year}, 1) AS m
+            UNION ALL
+            SELECT m + INTERVAL 1 MONTH
+            FROM months
+            WHERE m &lt; MAKEDATE(#{year}, 1) + INTERVAL 11 MONTH
+        )
+        SELECT
+            CONCAT(MONTH(months.m), '月') AS name,
+            COALESCE(SUM(woo.total_quantity), 0) AS value
+        FROM months
+        LEFT JOIN wms_out_orders woo
+            <!-- 旧条件只使用 expected_ship_time，时间为空的出库单不会进入趋势统计。 -->
+            <!-- ON woo.expected_ship_time &gt;= months.m
+            AND woo.expected_ship_time &lt; months.m + INTERVAL 1 MONTH -->
+            ON COALESCE(woo.expected_ship_time, woo.create_time) &gt;= months.m
+            AND COALESCE(woo.expected_ship_time, woo.create_time) &lt; months.m + INTERVAL 1 MONTH
+            <if test="warehouseId != null and warehouseId != ''">
+                AND woo.warehouse_id = #{warehouseId}
+            </if>
+        GROUP BY months.m
+        ORDER BY months.m
+    </select>
+
+    <select id="countConsigneeOutbound"
+            resultType="org.jeecg.modules.wms.analysis.vo.RankItemVO">
+        SELECT
+            COALESCE(SUM(wooi.packed_quantity), 0) AS total,
+            wco.owner_name AS name
+        FROM wms_out_orders_items wooi
+        LEFT JOIN wms_out_orders woo ON wooi.order_id = woo.id
+        LEFT JOIN wms_products wp ON wp.id = wooi.sku_id
+        <!-- 旧逻辑只按商品 owner_id 关联，部分出库单商品货主为空时排行榜没有货主名称。 -->
+        <!-- LEFT JOIN wms_cargo_owners wco ON wp.owner_id = wco.id -->
+        LEFT JOIN wms_cargo_owners wco
+            ON wco.id = COALESCE(woo.owner_id, wp.owner_id)
+        WHERE 1 = 1
+        <if test="warehouseId != null and warehouseId != ''">
+            AND woo.warehouse_id = #{warehouseId}
+        </if>
+        GROUP BY COALESCE(woo.owner_id, wp.owner_id), wco.id, wco.owner_name
+        ORDER BY total DESC
+    </select>
+
+</mapper>

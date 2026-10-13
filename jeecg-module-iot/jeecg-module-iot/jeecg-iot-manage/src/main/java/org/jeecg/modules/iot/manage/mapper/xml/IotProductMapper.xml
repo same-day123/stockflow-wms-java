@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.iot.manage.mapper.IotProductMapper">
+
+    <select id="selectProductRatio" resultType="org.jeecg.modules.iot.manage.dto.dashboard.ProductRatio">
+        SELECT
+            p.product_name AS productName,
+            p.product_code AS productCode,
+            COUNT(d.device_code) AS deviceCount,
+            ROUND(
+                COUNT(d.device_code) * 100.0 / (SELECT COUNT(*) FROM wms_iot_device
+                    WHERE d.warehouse_code IN
+                    <foreach collection="warehouseCodeList" item="warehouseCode" open="(" separator="," close=")">
+                        #{warehouseCode}
+                    </foreach>
+                ),
+                2
+            ) AS ratio
+        FROM wms_iot_product p
+        LEFT JOIN wms_iot_device d ON p.product_code = d.product_code
+        WHERE d.warehouse_code IN
+        <foreach collection="warehouseCodeList" item="warehouseCode" open="(" separator="," close=")">
+            #{warehouseCode}
+        </foreach>
+        GROUP BY p.product_code, p.product_name
+        ORDER BY deviceCount desc
+    </select>
+</mapper>
