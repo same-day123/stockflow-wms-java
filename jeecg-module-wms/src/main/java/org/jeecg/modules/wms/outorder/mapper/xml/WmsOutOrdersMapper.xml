@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.wms.outorder.mapper.WmsOutOrdersMapper">
+	<update id="batchUpdateWaveId">
+		UPDATE wms_out_orders
+		SET wave_id = #{waveId},shipment_strategy = #{shipmentStrategy}
+		WHERE
+			id IN
+			<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+				#{orderId}
+			</foreach>
+	</update>
+
+
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.wms.outorder.entity.WmsOutOrders">
+		SELECT *
+		FROM  wms_out_orders
+		WHERE
+			 wave_id = #{mainId}
+	</select>
+
+	<!--selectUnassignedOrders 获取未分配波次的出库单,状态为已分配 ALLOCATED 波次id为空-->
+	<select id="selectUnassignedOrders" parameterType="string" resultType="org.jeecg.modules.wms.outorder.entity.WmsOutOrders">
+		SELECT *
+		FROM  wms_out_orders
+		WHERE
+			warehouse_id = #{warehouseId}
+			and wave_id IS NULL
+			and status = 'ALLOCATED'
+	</select>
+    <select id="queryList" resultType="org.jeecg.modules.wms.outorder.entity.WmsOutOrders"
+            parameterType="org.jeecg.modules.wms.outorder.entity.WmsOutOrders">
+
+		select wco.owner_name, wwm.wave_no, t.*
+		from wms_out_orders t
+				 left join wms_cargo_owners wco on wco.id = t.owner_id
+				 left join wms_wave_master wwm on t.wave_id = wwm.id
+		 where 1=1
+		 <if test="orderNo != null and orderNo != ''">
+				and t.order_no=#{orderNo}
+		 </if>
+		 <!--状态-->
+		 <if test="status != null and status != ''">
+			and t.status= #{status}
+		 </if>
+		<!--波次号-->
+		 <if test="waveNo != null and waveNo != ''">
+			and wwm.wave_no= #{waveNo}
+		 </if>
+		<!--波次id-->
+		 <if test="waveId != null and waveId != ''">
+			and t.wave_id= #{waveId}
+		 </if>
+		<!--是否创建运单-->
+		 <if test="createdWaybill != null and createdWaybill != ''">
+			and t.created_waybill= #{createdWaybill}
+		 </if>
+		<if test="createdWaybill != null and createdWaybill != ''">
+			and (t.created_waybill = #{createdWaybill} or t.created_waybill is null)
+		</if>
+		order by t.create_time desc
+	</select>
+
+
+</mapper>
