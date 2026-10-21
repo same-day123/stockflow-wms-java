@@ -73,13 +73,9 @@ public class TestCallExpressNewAPIService {
 
 //        String msgData =tools.packageMsgData(standardService);
         //找到下载sdk下json文件的路径
-//        byte[] bytes = IoUtil.readBytes(new FileInputStream("D:\\course\\wms\\资料\\SF-CSIM-EXPRESS-SDK-V2.1.7-20220224\\SF-CSIM-EXPRESS-SDK-V2.1.7\\json\\ExpressJson\\01.order.json"));
-//        byte[] bytes = IoUtil.readBytes(new FileInputStream("D:\\course\\wms\\code\\02.order.query.json"));
-//        byte[] bytes = IoUtil.readBytes(new FileInputStream("D:\\IDEA\\idea project\\StarVMS_2026_04_25\\xincheng-wms-java-course\\jeecg-module-wms\\src\\test\\resources\\01.order.json"));
         byte[] bytes = IoUtil.readBytes(
                 TestCallExpressNewAPIService.class.getClassLoader().getResourceAsStream("01.order.json")
         );
-//        byte[] bytes = IoUtil.readBytes(new FileInputStream("D:\\course\\wms\\资料\\SF-CSIM-EXPRESS-SDK-V2.1.7-20220224\\SF-CSIM-EXPRESS-SDK-V2.1.7\\json\\ExpressJson\\20.cloud_print_waybills_2.json"));
 // 临时替换掉文件读取，用一行极简JSON测试
         String msgData = "{\"language\":\"zh-CN\",\"orderId\":\"TEST-20260815-002\",\"monthlyCard\":\"7551234567\"}";
 //        String msgData = new String(bytes, StandardCharsets.UTF_8);

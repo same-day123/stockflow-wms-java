@@ -1,4 +1,4 @@
-# StarVMS 仓储管理系统（后端）
+# 储流 WMS（StockFlow）仓储管理系统 · 后端
 
 基于 Spring Boot 3 + JeecgBoot 3.8 二次开发的仓储管理系统（WMS），覆盖从商品建档到发运出库的完整仓储业务闭环，并扩展了 AI 智能助手与 IoT 环境监控能力。
 
@@ -28,7 +28,7 @@
 ## 快速开始
 
 1. 环境要求：JDK 17、MySQL 8、Redis、Maven 3.8+
-2. 导入数据库：执行 `db/xingchenwms-20251114.sql`
+2. 导入数据库：执行 `db/stockflow-wms-20251114.sql`
 3. 修改 `jeecg-module-system/jeecg-system-start/src/main/resources/application-dev.yml` 中的数据库与 Redis 连接
 4. 启动：
 

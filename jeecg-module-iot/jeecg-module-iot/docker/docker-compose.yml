@@ -5,7 +5,7 @@ services:
     ports:
       - "18082:18082"
     volumes:
-      - /root/xingchen/wms/wms-iot/alert/config:/app/config
+      - /root/stockflow/wms/wms-iot/alert/config:/app/config
     restart: always
   wms-iot-simulate:
     image: itcast/wms-iot-simulate:1.0
@@ -13,5 +13,5 @@ services:
     ports:
       - "18084:18084"
     volumes:
-      - /root/xingchen/wms/wms-iot/simulate/config:/app/config
+      - /root/stockflow/wms/wms-iot/simulate/config:/app/config
     restart: always
