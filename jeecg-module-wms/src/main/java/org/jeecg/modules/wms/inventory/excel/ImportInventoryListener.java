@@ -24,6 +24,9 @@ public class ImportInventoryListener implements ReadListener<WmsInventoryExcel> 
      * 每隔5条存储数据库，实际使用中可以100条，然后清理list ，方便内存回收
      */
     private static final int BATCH_COUNT = 100;
+
+    /** 整份文件的累计结果 */
+    private final ImportResult result = new ImportResult();
     /**
      * 缓存的数据
      */
@@ -52,6 +55,7 @@ public class ImportInventoryListener implements ReadListener<WmsInventoryExcel> 
     @Override
     public void invoke(WmsInventoryExcel data, AnalysisContext context) {
         log.info("解析到一条数据:{}", JSON.toJSONString(data));
+        data.setRowNum(context.readRowHolder().getRowIndex() + 1);
         cachedDataList.add(data);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
@@ -59,6 +63,13 @@ public class ImportInventoryListener implements ReadListener<WmsInventoryExcel> 
             // 存储完成清理 list
             cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         }
+    }
+
+    /**
+     * 获取结果
+     */
+    public ImportResult getResult() {
+        return result;
     }
 
     /**
@@ -78,7 +89,7 @@ public class ImportInventoryListener implements ReadListener<WmsInventoryExcel> 
      */
     private void saveData() {
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        wmsInventoryService.importInventory(cachedDataList);
+        result.merge(wmsInventoryService.importInventory(cachedDataList));
         log.info("存储数据库成功！");
     }
 }

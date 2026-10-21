@@ -1,5 +1,6 @@
 package org.jeecg.modules.wms.inventory.controller;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +9,20 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.alibaba.excel.EasyExcel;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.wms.goods.excel.ImportGoodsListener;
+import org.jeecg.modules.wms.goods.excel.WmsProductsImport;
 import org.jeecg.modules.wms.inventory.entity.WmsInventory;
+import org.jeecg.modules.wms.inventory.excel.ImportInventoryListener;
+import org.jeecg.modules.wms.inventory.excel.ImportResult;
+import org.jeecg.modules.wms.inventory.excel.WmsInventoryExcel;
 import org.jeecg.modules.wms.inventory.service.IWmsInventoryService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -156,23 +164,43 @@ public class WmsInventoryController extends JeecgController<WmsInventory, IWmsIn
     * @param request
     * @param wmsInventory
     */
-    @RequiresPermissions("inventory:wms_inventory:exportXls")
+//    @RequiresPermissions("inventory:wms_inventory:exportXls")
     @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, WmsInventory wmsInventory) {
-        return super.exportXls(request, wmsInventory, WmsInventory.class, "库存表");
+    public void exportXls(HttpServletRequest request, HttpServletResponse response, WmsInventory wmsInventory) throws IOException {
+		//首先使用本类自带的查询方法查询数据
+		Result<IPage<WmsInventory>> iPageResult = this.queryPageList(wmsInventory, 1, 1000, request);
+		//从这个结果集合里去除库存表list
+		List<WmsInventory> records = iPageResult.getResult().getRecords();
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setCharacterEncoding("utf-8");
+		// 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+		String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
+		response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+		EasyExcel.write(response.getOutputStream(), WmsInventory.class).sheet("模板").doWrite(records);
     }
+//	 @RequiresPermissions("inventory:wms_inventory:exportXls")
+//	 @RequestMapping(value = "/exportXls")
+//	 public ModelAndView exportXls(HttpServletRequest request, WmsInventory wmsInventory) {
+//		 return super.exportXls(request, wmsInventory, WmsInventory.class, "库存表");
+//	 }
 
     /**
       * 通过excel导入数据
     *
-    * @param request
-    * @param response
+    * @param file
     * @return
     */
-    @RequiresPermissions("inventory:wms_inventory:importExcel")
-    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-        return super.importExcel(request, response, WmsInventory.class);
-    }
+//	@RequiresPermissions("inventory:wms_inventory:importExcel")
+	@RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+	public Result<?> importExcel(MultipartFile file) throws IOException {
+		ImportInventoryListener importInventoryListener = new ImportInventoryListener(wmsInventoryService);
+		EasyExcel.read(file.getInputStream(), WmsInventoryExcel.class, importInventoryListener).sheet().doRead();
+		return Result.OK(importInventoryListener.getResult().toMessage());
+	}
+//    @RequiresPermissions("inventory:wms_inventory:importExcel")
+//    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+//    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+//        return super.importExcel(request, response, WmsInventory.class);
+//    }
 
 }

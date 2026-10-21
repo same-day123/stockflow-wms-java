@@ -56,6 +56,12 @@
             <artifactId>jeecg-boot-module-airag</artifactId>
             <version>${jeecgboot.version}</version>
         </dependency>
+        <!-- WMS 仓储管理模块 -->
+        <dependency>
+            <groupId>org.jeecgframework.boot</groupId>
+            <artifactId>jeecg-module-wms</artifactId>
+            <version>${jeecgboot.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

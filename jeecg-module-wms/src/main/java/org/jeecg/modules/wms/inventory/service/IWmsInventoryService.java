@@ -3,6 +3,8 @@ package org.jeecg.modules.wms.inventory.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.jeecg.modules.wms.inventory.entity.WmsInventory;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.wms.inventory.excel.ImportResult;
+import org.jeecg.modules.wms.inventory.excel.WmsInventoryExcel;
 import org.jeecg.modules.wms.outorder.entity.WmsOutOrdersItems;
 
 import java.util.List;
@@ -30,4 +32,11 @@ public interface IWmsInventoryService extends IService<WmsInventory> {
      * @param  skuItem sku信息
      */
     public List<WmsInventory> selectAvailableBySku(String warehouseId, WmsOutOrdersItems skuItem);
+
+    /**
+     * 导入库存
+     *
+     * @return
+     */
+    ImportResult importInventory(List<WmsInventoryExcel> cachedDataList);
 }

@@ -44,7 +44,7 @@ public class PutawayTasksController {
                                   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                   HttpServletRequest req) {
-       //todo 设置任务类型为收货任务
+       //设置任务类型为收货任务
        IPage<WmsTasks> wmsTasksIPage = wmsTasksService.list(wmsTasks, pageNo, pageSize);
        return Result.OK(wmsTasksIPage);
    }
@@ -54,7 +54,7 @@ public class PutawayTasksController {
                                   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                   HttpServletRequest req) {
-       //todo 设置任务类型为收货任务
+       //设置任务类型为收货任务
        IPage<WmsTasksRecords> records = wmsTasksRecordsService.pageList(wmsTasksRecords, pageNo, pageSize);
        return Result.OK(records);
    }

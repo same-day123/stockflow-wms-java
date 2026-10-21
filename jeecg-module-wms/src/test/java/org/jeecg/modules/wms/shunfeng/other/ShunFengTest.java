@@ -18,7 +18,7 @@ public class ShunFengTest{
         expressOrder.setjCounty("南山区");
         expressOrder.setjCompany("金草中医");
         expressOrder.setjContact("李大宝");
-        expressOrder.setjTel("18777276920");
+        expressOrder.setjTel("13800138000");
         expressOrder.setjAddress("龙珠四路金谷创业园c座611");
 
         expressOrder.setdProvince("广东省");
@@ -26,7 +26,7 @@ public class ShunFengTest{
         expressOrder.setdCounty("海珠区");
         expressOrder.setdCompany("个人");
         expressOrder.setdContact("滕大宝");
-        expressOrder.setdTel("18938905541");
+        expressOrder.setdTel("13900139000");
         expressOrder.setdAddress("宝芝林大厦701室");
         System.out.println("顺丰下单");
         String requestXml = RequestXmlUtil.getOrderServiceRequestXml(expressOrder);

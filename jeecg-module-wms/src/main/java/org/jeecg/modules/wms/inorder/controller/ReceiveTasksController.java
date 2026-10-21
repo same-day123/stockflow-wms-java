@@ -82,6 +82,7 @@ public class ReceiveTasksController extends JeecgController<WmsTasks, IWmsTasksS
 		 IPage<WmsTasksRecords> records = wmsTasksRecordsService.pageList(wmsTasksRecords, pageNo, pageSize);
 		 return Result.OK(records);
 	 }
+
 	 /**
 	  * 创建收货任务
 	  * 参数： 入库单id,执行人
@@ -91,14 +92,14 @@ public class ReceiveTasksController extends JeecgController<WmsTasks, IWmsTasksS
 	 @RequiresPermissions("inorder:receive_task:add")
 	 @PostMapping(value = "/add")
 	 public Result<String> add(String orderIds, String operator){
-		 if(StringUtils.isEmpty(orderIds) || StringUtils.isEmpty( operator)){
+		 if (StringUtils.isEmpty(orderIds) || StringUtils.isEmpty(operator)) {
 			 return Result.error("请选择入库单及执行人！");
 		 }
 		 String[] orderIdArray = orderIds.split(",");
-		 if(orderIdArray.length == 0){
+		 if (orderIdArray.length == 0) {
 			 return Result.error("请选择入库单！");
 		 }
-		 for (String orderId : orderIdArray){
+		 for (String orderId : orderIdArray) {
 			 wmsTasksService.createReceiveTask(orderId, operator);
 		 }
 		 return Result.OK("创建成功！");

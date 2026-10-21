@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.modules.wms.config.WarehouseDictEnum;
 import org.jeecg.modules.wms.goods.entity.WmsProducts;
 import org.jeecg.modules.wms.goods.service.IWmsProductsService;
@@ -55,6 +56,10 @@ public class WmsInventoryTransByPutway extends ServiceImpl<WmsInventoryTransMapp
     //注入商品service
     @Autowired
     private IWmsProductsService wmsProductsService;
+
+    /**
+     * 库存变更
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transfer(WmsInventoryTransParam inventoryTransParam) {
@@ -71,67 +76,79 @@ public class WmsInventoryTransByPutway extends ServiceImpl<WmsInventoryTransMapp
         WmsProducts products = wmsProductsService.getById(inventoryTransParam.getProductId());
         if (products == null) {
             //抛出异常
-            throw new RuntimeException("商品id在商品表中不存在");
+            throw new JeecgBootException("商品id在商品表中不存在");
         }
+
         //===================源储位扣减库存=====================
         //根据源储位编码、商品id、容器编码查询库存表
         WmsInventory wmsInventorySource = wmsInventoryService.getInventoryByUniqueKey(inventoryTransParam.getProductId(), inventoryTransParam.getSourceLocationCode(), inventoryTransParam.getBatchNumber());
         //如果wmsInventorySource为空则抛出异常
         if (wmsInventorySource == null) {
             //抛出异常
-            throw new RuntimeException("源储位编码或商品id在库存中不存在");
+            throw new JeecgBootException("源储位编码或商品id在库存中不存在");
         }
         LambdaUpdateWrapper<WmsInventory> wmsInventoryLambdaUpdateWrapper = new LambdaUpdateWrapper<WmsInventory>()
                 .eq(WmsInventory::getId, wmsInventorySource.getId())
                 .setSql("stock_quantity=stock_quantity-{0}", inventoryTransParam.getExecQuantity())
                 .setSql("available_quantity=available_quantity-{0}", inventoryTransParam.getExecQuantity())
-                        .ge(WmsInventory::getStockQuantity,inventoryTransParam.getExecQuantity())
-                                .ge(WmsInventory::getAvailableQuantity,inventoryTransParam.getExecQuantity());
+                .ge(WmsInventory::getStockQuantity, inventoryTransParam.getExecQuantity())
+                .ge(WmsInventory::getAvailableQuantity, inventoryTransParam.getExecQuantity());
         boolean update = wmsInventoryService.update(null, wmsInventoryLambdaUpdateWrapper);
         if (!update) {
             //抛出异常
-            throw new RuntimeException("更新库存失败");
+            throw new JeecgBootException("更新库存失败");
         }
         //插入库存变更表
         WmsInventoryTrans wmsInventoryTrans = new WmsInventoryTrans();
         wmsInventoryTrans.setProductId(inventoryTransParam.getProductId());
         wmsInventoryTrans.setLocationCode(inventoryTransParam.getSourceLocationCode());
         wmsInventoryTrans.setBatchNumber(inventoryTransParam.getBatchNumber());
-        wmsInventoryTrans.setChangeQuantity(inventoryTransParam.getExecQuantity()*-1);
+        wmsInventoryTrans.setChangeQuantity(inventoryTransParam.getExecQuantity() * -1);
         wmsInventoryTrans.setTransactionType(inventoryTransParam.getTransactionType());
         wmsInventoryTrans.setRemarks(inventoryTransParam.getRemarks());
         wmsInventoryTrans.setTransactionTime(new Date());
         save(wmsInventoryTrans);
         //===================目标储位增加库存=====================
 
+        //如果商品为良品则无法上架到不可售的储位
+
+
         //根据唯一key获取库存
         WmsInventory wmsInventoryDb = wmsInventoryService.getInventoryByUniqueKey(inventoryTransParam.getProductId(), inventoryTransParam.getTargetLocationCode(), inventoryTransParam.getBatchNumber());
         //判断库存是否为空
         if (wmsInventoryDb == null) {
-            //根据储位编码查询储位 信息
-            LambdaQueryWrapper<WmsStorageLocations> eq = new LambdaQueryWrapper<WmsStorageLocations>().eq(WmsStorageLocations::getLocationCode, inventoryTransParam.getTargetLocationCode());
+            //根据储位编码查询储位信息
+            LambdaQueryWrapper<WmsStorageLocations> eq = new LambdaQueryWrapper<WmsStorageLocations>()
+                    .eq(WmsStorageLocations::getLocationCode, inventoryTransParam.getTargetLocationCode());
             WmsStorageLocations wmsStorageLocations = wmsStorageLocationsService.getBaseMapper().selectOne(eq);
             if (wmsStorageLocations == null) {
                 //抛出异常
-                throw new RuntimeException("储位编码在储位表中不存在");
+                throw new JeecgBootException("储位编码在储位表中不存在");
             }
-            //是否可售库存
+            //货物质量：来源库存的可售属性即代表货物属性(良品可售=1，不良品不可售=0)
+            String goodsIsSellable = wmsInventorySource.getIsSellable();
+            //目标储位的可售属性
             String isSellable = wmsStorageLocations.getIsSellable();
+            //良品只能进入可售储位，不良品只能进入不可售储位
+            if (!goodsIsSellable.equals(isSellable)) {
+                //抛出异常
+                throw new JeecgBootException("良品只能上架到可售储位，不良品只能上架到不可售储位");
+            }
             //创建库存对象
             wmsInventoryDb = new WmsInventory();
-            BeanUtils.copyProperties(inventoryTransParam,wmsInventoryDb);
+            BeanUtils.copyProperties(inventoryTransParam, wmsInventoryDb);
             wmsInventoryDb.setOwnerId(products.getOwnerId());
             wmsInventoryDb.setLocationCode(inventoryTransParam.getTargetLocationCode());
             wmsInventoryDb.setStockQuantity(inventoryTransParam.getExecQuantity());
             //如果储位是可售库存，则设置可用库存为数量
-            wmsInventoryDb.setAvailableQuantity("1".equals(isSellable)?inventoryTransParam.getExecQuantity():0);
+            wmsInventoryDb.setAvailableQuantity("1".equals(isSellable) ? inventoryTransParam.getExecQuantity() : 0);
             wmsInventoryDb.setAllocatedQuantity(0);
             //是否可售
             wmsInventoryDb.setIsSellable(isSellable);
             //入库时间
             wmsInventoryDb.setStockInTime(inventoryTransParam.getOperationTime());
             wmsInventoryService.save(wmsInventoryDb);
-        }else{
+        } else {
             String isSellable = wmsInventoryDb.getIsSellable();
             LambdaUpdateWrapper<WmsInventory> wmsInventoryLambdaUpdateWrapper2 = new LambdaUpdateWrapper<WmsInventory>()
                     .eq(WmsInventory::getId, wmsInventoryDb.getId())
@@ -140,7 +157,7 @@ public class WmsInventoryTransByPutway extends ServiceImpl<WmsInventoryTransMapp
             boolean update1 = wmsInventoryService.update(null, wmsInventoryLambdaUpdateWrapper2);
             if (!update1) {
                 //抛出异常
-                throw new RuntimeException("更新库存失败");
+                throw new JeecgBootException("更新库存失败");
             }
 
         }

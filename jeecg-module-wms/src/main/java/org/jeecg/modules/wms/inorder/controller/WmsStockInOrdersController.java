@@ -122,6 +122,7 @@ public class WmsStockInOrdersController {
 		wmsStockInOrdersService.updateMain(wmsStockInOrders, wmsStockInOrdersPage.getWmsStockInOrderItemsList());
 		return Result.OK("编辑成功!");
 	}
+
 	 /**
 	  * 提交审核
 	  */
@@ -133,6 +134,7 @@ public class WmsStockInOrdersController {
 		 wmsStockInOrdersService.submitAudit(wmsStockInOrdersPage);
 		 return Result.OK("提交成功！");
 	 }
+
 	 /**
 	  *  审核
 	  *
@@ -147,6 +149,7 @@ public class WmsStockInOrdersController {
 		 wmsStockInOrdersService.audit(wmsStockInOrdersPage);
 		 return Result.OK("审核完成!");
 	 }
+
 	/**
 	 *   通过id删除
 	 *
